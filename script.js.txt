@@ -1,0 +1,43 @@
+let salesData = [];
+function addSales() {
+    const name = document.getElementById('name').value;
+    const sales = parseFloat(document.getElementById('sales').value);
+    const file = document.getElementById('imageUpload').files[0];
+    
+    if (!name || isNaN(sales)) {
+        alert("Sila isi nama dan jumlah sales!");
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        salesData.push({ name, sales, image: e.target.result });
+        salesData.sort((a, b) => b.sales - a.sales);
+        salesData = salesData.slice(0, 10); 
+        updateLeaderboard();
+    };
+    
+    if (file) {
+        reader.readAsDataURL(file);
+    } else {
+        salesData.push({ name, sales, image: 'images/default.png' });
+        salesData.sort((a, b) => b.sales - a.sales);
+        salesData = salesData.slice(0, 10);
+        updateLeaderboard();
+    }
+}
+
+function updateLeaderboard() {
+    const leaderboard = document.getElementById('leaderboard');
+    leaderboard.innerHTML = '';
+    salesData.forEach((entry, index) => {
+        leaderboard.innerHTML += `
+            <div class="entry">
+                <span>#${index + 1}</span>
+                <img src="${entry.image}" alt="Profile">
+                <span>${entry.name}</span>
+                <span>RM ${entry.sales.toFixed(2)}</span>
+            </div>
+        `;
+    });
+}
