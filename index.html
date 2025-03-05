@@ -1,22 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ENRICH MASTER Sales Leaderboard</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Live Ranking Sales</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 50%; margin: auto; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 10px; }
+        th { background-color: #f2f2f2; }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🏆 ENRICH MASTER Sales Leaderboard 🏆</h1>
-        <input type="text" id="name" placeholder="Masukkan Nama">
-        <input type="number" id="sales" placeholder="Jumlah Sales (RM)">
-        <input type="file" id="imageUpload" accept="image/*">
-        <button onclick="addSales()">Tambah Sales</button>
-        
-        <div class="leaderboard" id="leaderboard"></div>
-    </div>
-    
-    <script src="script.js"></script>
+
+    <h1>Live Ranking Sales Team</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nama</th>
+                <th>Sales (RM)</th>
+            </tr>
+        </thead>
+        <tbody id="rankingTable">
+            <tr><td colspan="2">Loading...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        const sheetID = "1nvxvvaqUj4IdcjVJ4W9WNtHu3wsBiLBon5auRwcW6oQ";
+        const apiKey = "AIzaSyCKAVzjKWpWhJUimDpvGLVDL5SoEo01yR0";
+
+        async function fetchSalesData() {
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetID}/values/A2:B?key=${apiKey}`;
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.values) {
+                let tableContent = "";
+                data.values.sort((a, b) => b[1] - a[1]);  // Sort ranking
+                data.values.forEach(row => {
+                    tableContent += `<tr><td>${row[0]}</td><td>${row[1]}</td></tr>`;
+                });
+                document.getElementById("rankingTable").innerHTML = tableContent;
+            } else {
+                document.getElementById("rankingTable").innerHTML = "<tr><td colspan='2'>No Data</td></tr>";
+            }
+        }
+
+        fetchSalesData();
+        setInterval(fetchSalesData, 60000);  // Auto refresh setiap 60 saat
+    </script>
+
 </body>
 </html>
